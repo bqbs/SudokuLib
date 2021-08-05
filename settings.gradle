@@ -1,0 +1,3 @@
+include ':libsudoku'
+include ':app'
+rootProject.name = "SudokuLib"

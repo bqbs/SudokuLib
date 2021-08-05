@@ -1,0 +1,67 @@
+plugins {
+    id 'java-library'
+    id 'kotlin'
+    id 'maven-publish'
+}
+
+group = 'com.jclian'
+version = '1.0'
+
+java {
+    sourceCompatibility = JavaVersion.VERSION_1_8
+    targetCompatibility = JavaVersion.VERSION_1_8
+}
+
+publishing {
+    publications {
+        mavenJava(MavenPublication) {
+            artifactId = 'sudoku-lib'
+            from components.java
+            versionMapping {
+                usage('java-api') {
+                    fromResolutionOf('runtimeClasspath')
+                }
+                usage('java-runtime') {
+                    fromResolutionResult()
+                }
+            }
+            pom {
+                name = 'Sudoku Library'
+                description = 'Sudoku generator'
+                url = ''
+//                properties = [
+//                ]
+                licenses {
+                    license {
+                        name = 'The Apache License, Version 2.0'
+                        url = 'http://www.apache.org/licenses/LICENSE-2.0.txt'
+                    }
+                }
+                developers {
+                    developer {
+                        id = 'codemonkeyjc'
+                        name = 'Lian Jin Chu'
+                        email = 'codemonkeyjc@gmail.com'
+                    }
+                }
+                scm {
+//                    connection = 'scm:git:git://example.com/my-library.git'
+//                    developerConnection = 'scm:git:ssh://example.com/my-library.git'
+//                    url = 'http://example.com/my-library/'
+                }
+            }
+        }
+    }
+    repositories {
+        maven {
+            def releasesRepoUrl = layout.buildDirectory.dir('repos/releases')
+            def snapshotsRepoUrl = layout.buildDirectory.dir('repos/snapshots')
+            println "maven地址" + releasesRepoUrl
+            println "maven地址" + snapshotsRepoUrl
+            url = project.hasProperty('release') ? releasesRepoUrl : snapshotsRepoUrl
+        }
+    }
+}
+dependencies {
+    implementation "org.jetbrains.kotlin:kotlin-stdlib:$kotlin_version"
+}
