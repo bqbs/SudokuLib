@@ -15,6 +15,9 @@ import kotlin.collections.HashSet
  * 下面使用kotlin，转写了一下
  */
 object Sudoku {
+
+    var needLog = true
+
     fun initLocationDict(initCount: Int): HashMap<String, Int> {
         val dict = HashMap<String, Int>()
         val s = HashSet<Int>()
@@ -61,7 +64,7 @@ object Sudoku {
         return arr
     }
 
-    fun getSudokuMap(ans: ArrayList<String>): HashMap<String, Int> {
+    fun getSudokuMap(ans: ArrayList<String>, isFull: Boolean = false): HashMap<String, Int> {
         val map = HashMap<String, Int>()
         ans.sort()
         val arr = Array(9) { IntArray(9) }
@@ -73,6 +76,10 @@ object Sudoku {
             map["$i,$j"] = k
         }
 
+        // 返回完整的map
+        if (isFull) {
+            return map
+        }
         // 随机挖空
         for (count in 0..30) {
             val i: Int = (Math.random() * 9).toInt()
@@ -245,8 +252,9 @@ object Sudoku {
         val ans = ArrayList<String>()
         danceLinkX(head, ans)
         if (ans.size > 0) {
-            Log.d("Sudoku", "$ans")
+            Log.d("Sudoku", "$ans", needLog)
             val map: HashMap<String, Int> = getSudokuMap(ans)
+            Log.d("Sudoku", map.toString(), needLog)
             head = getSudokuLinkedList(initData)
             ans.clear()
             danceLinkX(head, ans)
@@ -259,6 +267,26 @@ object Sudoku {
 
     }
 
+    fun gen(initData: HashMap<String, Int>): HashMap<String, Int> {
+        var head = getSudokuLinkedList(initData)
+        val ans = ArrayList<String>()
+        danceLinkX(head, ans)
+        if (ans.size > 0) {
+            val map: HashMap<String, Int> = getSudokuMap(ans, true)
+            head = getSudokuLinkedList(initData)
+            ans.clear()
+            danceLinkX(head, ans)
+            Log.d("Sudoku", "${ans.size} details=$ans", needLog)
+
+            if (ans.size > 0) {
+                return map
+            }
+            return gen(initData)
+        }
+        return gen(initData)
+
+    }
+
     fun check(data: HashMap<String, Int>): Boolean {
         val head = getSudokuLinkedList(data)
         val ans = ArrayList<String>()
@@ -266,5 +294,59 @@ object Sudoku {
         return ans.size > 0
     }
 
+    fun check(initMap: HashMap<String, Int>, answerMap: HashMap<String, Int>): Boolean {
+        val hashMap = hashMapOf<String, Int>()
+        hashMap.putAll(initMap)
+        hashMap.putAll(answerMap)
+        return check(hashMap)
+    }
+
+
+    @ExperimentalStdlibApi
+    fun solve(str: String): HashMap<String, Int> {
+        val hashMap = HashMap<String, Int>()
+
+        if (str.isBlank()) {
+            return hashMap
+        }
+
+        str.replace(",", "", false).let {
+            if (it.length != 81) {
+                return hashMap
+            }
+
+            it.forEachIndexed { index, c ->
+                val j = index % 9
+                val i = index / 9
+                if (c.digitToInt() != 0) {
+                    hashMap["$i,$j"] = c.digitToInt()
+                }
+            }
+            Log.d("sudoku", "initmap = ${hashMap.toString()}", needLog)
+            return gen(hashMap)
+        }
+    }
+
+    @ExperimentalStdlibApi
+    @JvmStatic
+    fun main(args: Array<String>) {
+        val s = "600400030200000000100000009920300000000800601000000000000000080002509000000700000"
+        for (i in 0 until 9) {
+            for (j in 0 until 9) {
+                print("${s[i * 9 + j]}  ")
+            }
+            println()
+        }
+        println()
+        needLog = false
+        val map = solve(s)
+        println("Solved")
+        for (i in 0 until 9) {
+            for (j in 0 until 9) {
+                print("${map["$i,$j"]}  ")
+            }
+            println()
+        }
+    }
 
 }
