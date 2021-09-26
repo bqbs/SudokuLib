@@ -5,7 +5,7 @@ plugins {
 }
 
 group = 'com.jclian'
-version = '1.0'
+version = '0.1'
 
 java {
     sourceCompatibility = JavaVersion.VERSION_1_8
@@ -40,25 +40,22 @@ publishing {
                 developers {
                     developer {
                         id = 'codemonkeyjc'
-                        name = 'Lian Jin Chu'
+                        name = 'Lian J.C.'
                         email = 'codemonkeyjc@gmail.com'
                     }
-                }
-                scm {
-//                    connection = 'scm:git:git://example.com/my-library.git'
-//                    developerConnection = 'scm:git:ssh://example.com/my-library.git'
-//                    url = 'http://example.com/my-library/'
                 }
             }
         }
     }
     repositories {
         maven {
-            def releasesRepoUrl = layout.buildDirectory.dir('repos/releases')
-            def snapshotsRepoUrl = layout.buildDirectory.dir('repos/snapshots')
-            println "maven地址" + releasesRepoUrl
-            println "maven地址" + snapshotsRepoUrl
-            url = project.hasProperty('release') ? releasesRepoUrl : snapshotsRepoUrl
+            name = "GitHubPackages"
+            url = uri("https://maven.pkg.github.com/bqbs/SudokuLib")
+            credentials {
+                username = "codemonkeyjc@gmail.com"
+                password = project.findProperty("gpr.key") ?: System.getenv("GITHUB_TOKEN")
+                print("password=$password")
+            }
         }
     }
 }
