@@ -60,6 +60,7 @@ class CrossCycleLinkNode<T>(val value: T, val row: String) {
     }
 
     override fun toString(): String {
+//       return col.value.toString()
         return super.toString()
     }
 }

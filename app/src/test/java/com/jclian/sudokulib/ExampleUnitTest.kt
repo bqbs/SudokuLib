@@ -4,6 +4,8 @@ import com.jclian.libsudoku.Sudoku
 import org.junit.Test
 
 import org.junit.Assert.*
+import java.util.*
+import kotlin.collections.HashMap
 
 /**
  * Example local unit test, which will execute on the development machine (host).
@@ -11,10 +13,6 @@ import org.junit.Assert.*
  * See [testing documentation](http://d.android.com/tools/testing).
  */
 class ExampleUnitTest {
-    @Test
-    fun addition_isCorrect() {
-        assertEquals(4, 2 + 2)
-    }
 
     @ExperimentalStdlibApi
     @Test
@@ -37,4 +35,47 @@ class ExampleUnitTest {
             println()
         }
     }
+
+    @Test
+    fun genSudokuTest() {
+//        Sudoku.needLog = false
+        var start = System.currentTimeMillis()
+        val list = LinkedList<SudokuDelegate>()
+        for (i in 0..10) {
+            val s = System.currentTimeMillis()
+            val map = Sudoku.gen(isFull = false, blankCount = 50)
+            list.add(SudokuDelegate(map).also {
+                it.genTime = System.currentTimeMillis() - s
+            })
+            println("gen $i ${System.currentTimeMillis() - s}")
+        }
+        val genCost = System.currentTimeMillis() - start
+
+        start = System.currentTimeMillis()
+        for (sd: SudokuDelegate in list) {
+            val s = System.currentTimeMillis()
+            Sudoku.gen(sd.map, isFull = true)
+            sd.solvedTime = System.currentTimeMillis() - s
+        }
+
+        for (sd in list) {
+            println("${sd.map} , Solved Time ${sd.solvedTime} ms, gen time:${sd.genTime} ratio: ${sd.solvedTime / sd.genTime.toDouble()}")
+        }
+        println("cost: gen $genCost ms   solved ${System.currentTimeMillis() - start}")
+
+    }
+
+}
+
+data class SudokuDelegate(var map: HashMap<String, Int>) {
+    var solvedTime: Long = 0
+    var genTime: Long = 0
+
+    override fun equals(other: Any?): Boolean {
+        if (other is SudokuDelegate) {
+            return map == other.map
+        }
+        return false
+    }
+
 }

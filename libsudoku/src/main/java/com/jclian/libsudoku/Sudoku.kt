@@ -64,7 +64,19 @@ object Sudoku {
         return arr
     }
 
-    fun getSudokuMap(ans: ArrayList<String>, isFull: Boolean = false): HashMap<String, Int> {
+    /**
+     * [blankCount] 留白个数
+     */
+    fun getSudokuMap(
+        ans: ArrayList<String>,
+        isFull: Boolean = false,
+        blankCount: Int = 30
+    ): HashMap<String, Int> {
+        Log.d(
+            "sudoku", "ans=${ans.joinToString(",")} \n isFull=$isFull blankCount=$blankCount",
+            needLog
+        )
+
         val map = HashMap<String, Int>()
         ans.sort()
         val arr = Array(9) { IntArray(9) }
@@ -80,8 +92,9 @@ object Sudoku {
         if (isFull) {
             return map
         }
+        Log.d("sudoku", "Make blank for Puzzle")
         // 随机挖空
-        for (count in 0..30) {
+        while (map.size > 81 - blankCount) {
             val i: Int = (Math.random() * 9).toInt()
             val j: Int = (Math.random() * 9).toInt()
             val key = "$i,$j"
@@ -178,7 +191,7 @@ object Sudoku {
     }
 
     fun danceLinkX(head: CrossCycleLinkNode<String>, answers: ArrayList<String>): Boolean {
-//        Log.d("sudikuview#dance_link_x", "head=$head, ans=$answers")
+        Log.d("Sudoku#dance_link_x", "head=$head, ans=$answers", needLog)
         if (head.right == head) return true
 
         var node = head.right
@@ -245,49 +258,43 @@ object Sudoku {
         return false
     }
 
-
-    fun gen(): HashMap<String, Int> {
-        val initData = initLocationDict(11)
+    fun gen(
+        initMap: HashMap<String, Int>? = null,
+        isFull: Boolean = false,
+        blankCount: Int = 0
+    ): HashMap<String, Int> {
+        val initData = initMap ?: initLocationDict(11)
         var head = getSudokuLinkedList(initData)
         val ans = ArrayList<String>()
         danceLinkX(head, ans)
         if (ans.size > 0) {
-            Log.d("Sudoku", "$ans", needLog)
-            val map: HashMap<String, Int> = getSudokuMap(ans)
-            Log.d("Sudoku", map.toString(), needLog)
-            head = getSudokuLinkedList(initData)
-            ans.clear()
-            danceLinkX(head, ans)
-            if (ans.size > 0) {
-                return map
-            }
-            return gen()
-        }
-        return gen()
-
-    }
-
-    fun gen(initData: HashMap<String, Int>): HashMap<String, Int> {
-        var head = getSudokuLinkedList(initData)
-        val ans = ArrayList<String>()
-        danceLinkX(head, ans)
-        if (ans.size > 0) {
-            val map: HashMap<String, Int> = getSudokuMap(ans, true)
+            val map: HashMap<String, Int> = getSudokuMap(ans, isFull, blankCount)
             head = getSudokuLinkedList(initData)
             ans.clear()
             danceLinkX(head, ans)
             Log.d("Sudoku", "${ans.size} details=$ans", needLog)
-
             if (ans.size > 0) {
                 return map
             }
-            return gen(initData)
+            println("Can't gen puzzle.Retry")
+            return gen(initData, isFull, blankCount)
         }
-        return gen(initData)
+        println("No ans.Retry")
+        return gen(isFull = isFull, blankCount = blankCount)
 
     }
 
+    /**
+     * 用于检查答案
+     * [data] 传入一个完整数独
+     *
+     * Checking the answer
+     * [data] Pass a full map of Sudoku。
+     */
     fun check(data: HashMap<String, Int>): Boolean {
+        if (data.size < 81) {
+            return false
+        }
         val head = getSudokuLinkedList(data)
         val ans = ArrayList<String>()
         danceLinkX(head, ans)
@@ -300,7 +307,6 @@ object Sudoku {
         hashMap.putAll(answerMap)
         return check(hashMap)
     }
-
 
     @ExperimentalStdlibApi
     fun solve(str: String): HashMap<String, Int> {
@@ -323,7 +329,7 @@ object Sudoku {
                 }
             }
             Log.d("sudoku", "initmap = ${hashMap.toString()}", needLog)
-            return gen(hashMap)
+            return gen(hashMap, isFull = true)
         }
     }
 

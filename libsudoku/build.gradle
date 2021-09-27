@@ -52,9 +52,8 @@ publishing {
             name = "GitHubPackages"
             url = uri("https://maven.pkg.github.com/bqbs/SudokuLib")
             credentials {
-                username = "codemonkeyjc@gmail.com"
-                password = project.findProperty("gpr.key") ?: System.getenv("GITHUB_TOKEN")
-                print("password=$password")
+                username = System.getenv("GITHUB_USERNAME")
+                password = System.getenv("GITHUB_TOKEN")
             }
         }
     }
