@@ -1,10 +1,11 @@
 package com.jclian.libsudoku
-class CrossCycleLinkNode<T>(val value: T, val row: String) {
-    var up: CrossCycleLinkNode<T> = this
-    var down: CrossCycleLinkNode<T> = this
-    var left: CrossCycleLinkNode<T> = this
-    var right: CrossCycleLinkNode<T> = this
-    var col: CrossCycleLinkNode<T> = this
+
+class CrossCycleLinkNode(val value: String, val row: String) {
+    var up: CrossCycleLinkNode = this
+    var down: CrossCycleLinkNode = this
+    var left: CrossCycleLinkNode = this
+    var right: CrossCycleLinkNode = this
+    var col: CrossCycleLinkNode = this
 
     init {
         this.col = this
@@ -60,7 +61,7 @@ class CrossCycleLinkNode<T>(val value: T, val row: String) {
     }
 
     override fun toString(): String {
-//       return col.value.toString()
-        return super.toString()
+       return col.value.toString()
+//        return super.toString()
     }
 }

@@ -104,7 +104,7 @@ object Sudoku {
         return map
     }
 
-    fun getSudokuLinkedList(map: HashMap<String, Int>): CrossCycleLinkNode<String> {
+    fun getSudokuLinkedList(map: HashMap<String, Int>): CrossCycleLinkNode {
         val head = initCol(324)
         for (i in 0..8) {
             for (j in 0..8) {
@@ -146,7 +146,7 @@ object Sudoku {
         return head
     }
 
-    fun initCol(col_count: Int): CrossCycleLinkNode<String> {
+    fun initCol(col_count: Int): CrossCycleLinkNode {
         val head = CrossCycleLinkNode("head", "column")
         for (i in 0 until col_count) {
             val colNode = CrossCycleLinkNode(i.toString(), head.row)
@@ -159,9 +159,9 @@ object Sudoku {
     }
 
 
-    fun appendRow(head: CrossCycleLinkNode<String>, row_id: String, list: List<String>) {
+    fun appendRow(head: CrossCycleLinkNode, row_id: String, list: List<String>) {
 
-        var last: CrossCycleLinkNode<String>? = null
+        var last: CrossCycleLinkNode? = null
         var col = head.right
         for (num in list) {
             while (col != head) {
@@ -190,13 +190,23 @@ object Sudoku {
 
     }
 
-    fun danceLinkX(head: CrossCycleLinkNode<String>, answers: ArrayList<String>): Boolean {
-        Log.d("Sudoku#dance_link_x", "head=$head, ans=$answers", needLog)
+    /**
+     * [count] 增加一个计数器，强制结束
+     */
+    fun danceLinkX(
+        head: CrossCycleLinkNode,
+        answers: ArrayList<String>,
+        count: Int = 0
+    ): Boolean {
+        Log.d("Sudoku#dance_link_x", "ans=$answers \n ans.size=${answers.size}", needLog)
+
         if (head.right == head) return true
 
         var node = head.right
         while (node != head) {
-            if (node.down == node) return false
+            if (node.down == node) {
+                return false
+            }
             node = node.right
         }
 
@@ -238,8 +248,7 @@ object Sudoku {
                     }
                 }
             }
-            if (danceLinkX(head, answers)) {
-//            #while len(restores): restores.pop()()
+            if (danceLinkX(head, answers, count + 1)) {
                 return true
             }
             answers.removeAt(answers.size - 1)
@@ -271,7 +280,7 @@ object Sudoku {
             val map: HashMap<String, Int> = getSudokuMap(ans, isFull, blankCount)
             head = getSudokuLinkedList(initData)
             ans.clear()
-            danceLinkX(head, ans)
+            danceLinkX(head, ans, 0)
             Log.d("Sudoku", "${ans.size} details=$ans", needLog)
             if (ans.size > 0) {
                 return map
